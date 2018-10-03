@@ -1,0 +1,67 @@
+{%extends 'blog/base.html'%}
+{%load humanize%}
+{%block body_block%}
+<!-- Generic Views make a context name by themselves by using the model name in smallcase -->
+<div class="boxx">
+<h1 class='posttitle loader'>{{post.title}}</h1>
+
+{%if post.published_date%}
+<div class="date postdate">
+{{post.published_date|naturaltime}}
+</div>
+{%else%}
+<!--If the post is written but not published then we provide a link to go to publish page 
+ further process -->
+<a href="{%url 'blog:post_publish' pk=post.pk %}" class="btn btn-primary">Publish</a>
+{%endif%}
+
+<!-- Here by using safe filter we are making sure that  we escape the 
+tags which will get shown on the screen as we are using medium text editor
+better to check it by working with it -->
+<p class='postcontent'> {{post.text|safe|linebreaksbr}} </p>
+
+<!-- Checks for user authentication  and post shall be published or not -->
+    {%if user.is_authenticated%}
+            
+            <p>test</p>
+             <!-- <img src="{{post.upload_image_url|default_if_none:'#'}}"  width='240'> <br><br>         -->
+             <img src="{{post.upload_image.url|default_if_none:'#'}}"  width='240'> <br><br>
+             <a href="{%url 'blog:post_update' pk=post.pk%}" class="btn btn-primary">
+                <i class='fas fa-pencil-alt'></i>
+            </a>
+            
+            <a href="{%url 'blog:post_delete' pk=post.pk%}" class="btn btn-primary">
+                <i class='fas fa-trash'></i>
+            </a>
+    
+    {%endif%}
+</div>
+<hr>
+
+<!-- Comment Section -->
+<!-- We are using 'post.pk' as pk here bcz we dont have any comment yet so no comment pk too!! -->
+<a href="{%url 'blog:add_comment_to_post' pk=post.pk %}" class="btn btn-primary btn-comment">Comment</a>
+<!-- To show the Comments for each post  -->
+<div class="container">
+    {%for comment in post.comments.all%}
+    <br>
+    {%if user.is_authenticated or comment.approved_comment%}
+            {{comment.create_date}}
+                {%if not comment.approved_comment%}
+                    <a href="{%url 'blog:comment_delete' pk=comment.pk %}" class="btn btn-primary">
+                        <i class='fas fa-trash'></i>
+                    </a>
+
+                    <a href="{%url 'blog:comment_approve' pk=comment.pk %}" class="btn btn-primary">
+                        <i class='fas fa-thumbs-up'></i>
+                    </a>
+                {%endif%}
+            <p>{{comment.text|safe|linebreaks}}</p>
+            <p>Posted By: {{comment.author}} </p>
+    {%endif%}
+    {%empty%}
+    <p>No Comments!</p>
+    {%endfor%}
+</div>
+
+{%endblock%}

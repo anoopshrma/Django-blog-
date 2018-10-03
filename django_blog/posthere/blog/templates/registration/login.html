@@ -1,0 +1,18 @@
+{%extends 'blog/base.html'%}
+{%block body_block%}
+<div class="jumbotron">
+    <h3>login here!</h3>
+    <p>(must be a superuser to login here)</p>
+    {%if forms.errors%}
+    <p>Your Username and Password didnt match . Try again!</p>
+    {%endif%}
+    <form  method="POST">
+      {%csrf_token%}
+      {{form.as_p}}
+      <input type="submit" class='btn btn-primary' value='Login'>
+      <input type="hidden",name='next', value="{{next}}">
+      <p><strong>--OR--</strong></p>
+      <a href="{% url 'social:begin' 'github'%}">login with github</a>
+    </form>
+</div>
+{%endblock%}
